@@ -41,4 +41,21 @@ public class CGlobalStaticSource {
 	public static void cout(String in_str){
 		System.out.print(in_str);
 	}
+	
+	public static void cout_endl(String in_str){
+		System.out.println(in_str);
+	}
+	
+	public static void cerr(String in_str){
+		System.err.print(in_str);
+	}
+	
+	public static void cerr_endl(String in_str){
+		System.err.println(in_str);
+	}
+	
+	public static String int_to_str(int in_value){
+		Integer temp = new Integer(in_value);
+		return temp.toString();
+	}
 }

@@ -5,12 +5,13 @@ import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import Defines.DataDef;
 import Defines.DeduceDef;
 import PackageMsg.COptionMsg;
 
 public class CDeduceTable {
 	private HashMap<String, CDeduceTerm> term_list = new HashMap<String, CDeduceTerm>();
-	
+	private HashMap<String, DataDef> type_list = new HashMap<String, DataDef>();
 	/*
 	 * Private Functions
 	 */
@@ -41,8 +42,8 @@ public class CDeduceTable {
 	 * Interfaces 
 	 */
 	
-	public void create_new_term(String in_id){
-		this.add_term(in_id, new CDeduceTerm());
+	public void create_new_term(String in_id, DataDef in_type){
+		this.add_term(in_id, new CDeduceTerm(in_type));
 	}
 	
 	public boolean if_have_term(String in_id){
@@ -52,6 +53,11 @@ public class CDeduceTable {
 	public void set_term(String in_id, CDeduceExpr in_expr){
 		CDeduceTerm temp_term = term_list.get(in_id);
 		temp_term.add_data(in_expr);
+	}
+	
+	public void set_term(String in_id, CSetStruct in_set_struct){
+		CDeduceTerm temp_term = term_list.get(in_id);
+		temp_term.add_data(in_set_struct);
 	}
 	
 	public void set_term(String in_id, DeduceDef in_type, CDeduceExpr in_left_expr, CDeduceExpr in_right_expr){
@@ -64,8 +70,17 @@ public class CDeduceTable {
 		temp_term.add_cir_data(in_expr);
 	}
 	
+	public void set_cir_term(String in_id, CSetStruct in_set_struct){
+		CDeduceTerm temp_term = term_list.get(in_id);
+		temp_term.add_cir_data(in_set_struct);
+	}
+	
 	public CDeduceTerm get_term(String in_id){
 		return term_list.get(in_id);
+	}
+	
+	public DataDef get_term_type(String in_id){
+		return term_list.get(in_id).get_type();
 	}
 	
 	public LinkedList<String> get_terms_list(){
@@ -81,12 +96,19 @@ public class CDeduceTable {
 	 */
 	public void loop_init(){
 		for(Map.Entry<String, CDeduceTerm> cur_entry: term_list.entrySet()){
-			cur_entry.setValue(new CDeduceTerm(cur_entry.getKey()));
+			if(cur_entry.getValue().get_type() == DataDef.VALUE){
+				cur_entry.setValue(new CDeduceTerm(cur_entry.getKey()));
+			}
+			else if(cur_entry.getValue().get_type() == DataDef.SET){
+				CSetStruct cur_set_struct = new CSetStruct(cur_entry.getKey());
+				cur_entry.setValue(new CDeduceTerm(cur_set_struct));
+			}
 		}
 	}
 	
 	public String get_deduce_str(String in_id){
-		return in_id + "[" + get_term(in_id).get_cur_gen_age_str() + "] = " + get_term(in_id).get_cur_gen_str();
+		CDeduceTerm cur_term = get_term(in_id);
+		return in_id + "[" + cur_term.get_cur_gen_age_str() + "] = " + cur_term.get_cur_gen_data_str();
 	}
 	
 	/*

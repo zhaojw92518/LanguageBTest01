@@ -1,6 +1,3 @@
-package Defines;
-import Parsers.GrammarBParser;
-
 
 public enum QuaDef {
 	//No use
@@ -54,23 +51,8 @@ public enum QuaDef {
 	RET,
 	ASS,
 	NAME,
-	//Set
-	UNI,//并集
-	INT,//交集
-	SUB_S,//集合减
 	//State 
-	FUNC_BODY,
-	
-	//Scane
-	FUNC_SCANE,
-	//Loop
-	LOOP_GEN,
-	LOOP_CHANGE,
-	LOOP_INPUT,
-	LOOP_CONFIRM,
-	//loop_block的替代语句
-	LOOP_BLOCK,
-	JUMP;//专门做循环替代的跳转
+	FUNC_BODY;
 	
 	public String toString(){
 		return super.toString().toLowerCase();

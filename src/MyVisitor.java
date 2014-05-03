@@ -1,11 +1,4 @@
-package Parsers;
 import org.antlr.v4.runtime.misc.NotNull;
-
-import Deducers.CData;
-import Deducers.CQuaManager;
-import Deducers.CQuaternion;
-import Defines.DataDef;
-import Defines.QuaDef;
 
 
 public class MyVisitor extends GrammarBBaseVisitor<String> {
@@ -16,17 +9,6 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 	private String int_to_str(int in_int){
 		Integer temp_integer = new Integer(in_int);
 		return temp_integer.toString();
-	}
-	
-	private QuaDef set_symbol_to_qua(String in_symbol){
-		QuaDef return_result = null;
-		if(in_symbol.equals("/-\\") ){
-			return_result = QuaDef.INT;
-		}
-		else if(in_symbol.equals("\\-/")){
-			return_result = QuaDef.UNI;
-		}
-		return return_result;
 	}
 	
 	public CQuaManager get_qua_manager(){
@@ -87,7 +69,7 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 		for(int i = 0; i < ctx.ID().size(); i++){
 			qua_manager.push_back_quaternion(
 				QuaDef.DEC,
-				new CData(DataDef.TYPE, DataDef.get_data_def_from_parser(cur_type)),
+				new CData(DataDef.INT, int_to_str(cur_type)),
 				new CData(DataDef.ID, ctx.ID(i).getText()),
 				ctx.ID(i).getSymbol().getLine()
 			);
@@ -126,66 +108,6 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
 	@Override public String visitSet(@NotNull GrammarBParser.SetContext ctx) { return visitChildren(ctx); }
-	
-	public CData visitSetRD(@NotNull GrammarBParser.SetContext ctx){
-		CData return_result = null;
-		if(ctx.SET_SYMBOL_2() != null && ctx.SET_SYMBOL_2().size() != 0){
-			return_result = new CData(DataDef.ID, get_current_temp_value());
-			qua_manager.push_back_quaternion(QuaDef.SUB_S, visitSet_term_1RD(ctx.set_term_1(0)), visitSet_term_1RD(ctx.set_term_1(1)), return_result, 0);
-			for(int i = 1; i < ctx.SET_SYMBOL_2().size(); i++){
-				qua_manager.push_back_quaternion(
-						QuaDef.SUB_S, 
-						return_result, 
-						visitSet_term_1RD(ctx.set_term_1(i + 1)), 
-						return_result, 
-						0);
-			}
-		}
-		else{
-			return_result = visitSet_term_1RD(ctx.set_term_1(0));
-		}
-		return return_result;
-	}
-	
-	public CData visitSet_term_0RD(@NotNull GrammarBParser.Set_term_0Context ctx){
-		CData return_result = null;
-		if(ctx.ID() != null){
-			return_result = new CData(DataDef.ID, ctx.ID().getText());
-		}
-		else if(ctx.element() != null && ctx.element().size() != 0){
-			return_result = new CData();
-			return_result.type = DataDef.SET;
-			for(int i = 0; i < ctx.element().size(); i++){
-				return_result.add_set_element(visitElementRD(ctx.element(i)));
-			}
-		}
-		return return_result;
-	}
-	
-	public CData visitSet_term_1RD(@NotNull GrammarBParser.Set_term_1Context ctx){
-		CData return_result = null;
-		if(ctx.SET_SYMBOL_1() != null && ctx.SET_SYMBOL_1().size() != 0){
-			return_result = new CData(DataDef.ID, get_current_temp_value());
-			qua_manager.push_back_quaternion(
-					set_symbol_to_qua(ctx.SET_SYMBOL_1(0).getText()), 
-					visitSet_term_0RD(ctx.set_term_0(0)), 
-					visitSet_term_0RD(ctx.set_term_0(1)), 
-					return_result, 
-					0);
-			for(int i = 1; i < ctx.SET_SYMBOL_1().size(); i++){
-				qua_manager.push_back_quaternion(
-						set_symbol_to_qua(ctx.SET_SYMBOL_1(i).getText()), 
-						return_result, 
-						visitSet_term_0RD(ctx.set_term_0(i + 1)), 
-						return_result, 
-						0);
-			}
-		}
-		else{
-			return_result = visitSet_term_0RD(ctx.set_term_0(0));
-		}
-		return return_result;
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -304,20 +226,9 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			for(int i = 0; i < ctx.ID().size(); i++){
 				qua_manager.push_back_quaternion(
 						QuaDef.DEC,
-						new CData(DataDef.TYPE, DataDef.get_data_def_from_parser(cur_type)),
+						new CData(DataDef.INT, int_to_str(cur_type)),
 						new CData(DataDef.ID, ctx.ID(i).getText()),
 						new CData(DataDef.INT, ctx.signed_integer(i).getText()),
-						ctx.ID(i).getSymbol().getLine()
-				);
-			}
-			break;
-		case GrammarBParser.SET_TYPE:
-			for(int i = 0; i < ctx.ID().size(); i++){
-				qua_manager.push_back_quaternion(
-						QuaDef.DEC,
-						new CData(DataDef.TYPE, DataDef.get_data_def_from_parser(cur_type)),
-						new CData(DataDef.ID, ctx.ID(i).getText()),
-						visitSetRD(ctx.set(i)),
 						ctx.ID(i).getSymbol().getLine()
 				);
 			}
@@ -336,9 +247,13 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			for(int i = 0; i < ctx.ID().size(); i++){
 				printQuaternion("del " + cur_type_str + " " + ctx.ID(i) + " " + ctx.STRING(i).getText());
 			}
-			break;*/
-		
-		/*case GrammarBParser.TUPLE_TYPE:
+			break;
+		case GrammarBParser.SET_TYPE:
+			for(int i = 0; i < ctx.ID().size(); i++){
+				printQuaternion("del " + cur_type_str + " " + ctx.ID(i) + " " + ctx.set(i).getText());
+			}
+			break;
+		case GrammarBParser.TUPLE_TYPE:
 			for(int i = 0; i < ctx.ID().size(); i++){
 				printQuaternion("del " + cur_type_str + " " + ctx.ID(i) + " " + ctx.element_group(i).getText());
 			}
@@ -387,6 +302,22 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 	 * The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
+	@Override public String visitSet_term_0(@NotNull GrammarBParser.Set_term_0Context ctx) { return visitChildren(ctx); }
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 */
+	@Override public String visitSet_term_1(@NotNull GrammarBParser.Set_term_1Context ctx) { return visitChildren(ctx); }
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 */
 	@Override public String visitNo_return_declare(@NotNull GrammarBParser.No_return_declareContext ctx) { return visitChildren(ctx); }
 
 	/**
@@ -405,6 +336,9 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			return_result = visitExpressionRD(ctx.expression());
 		}
 		else if(ctx.element_group() != null){
+			
+		}
+		else if(ctx.set() != null){
 			
 		}
 		else if(ctx.BOOL() != null){
@@ -488,7 +422,7 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
 	@Override public String visitCirculate_stat(@NotNull GrammarBParser.Circulate_statContext ctx) { 
-		qua_manager.push_back_quaternion(QuaDef.LOOP, ctx.condition().start.getLine());
+		qua_manager.push_back_quaternion(QuaDef.LOOP);
 		CQuaternion begin_label = get_current_label(),
 					end_label	= get_current_label();
 		qua_manager.push_back_quaternion(begin_label);
@@ -509,9 +443,17 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 				CQuaternion.NO_USE_LINE_NUM
 				);
 		qua_manager.push_back_quaternion(end_label);
-		qua_manager.push_back_quaternion(QuaDef.LOOP_END, ctx.RIGHT_BRACE().getSymbol().getLine());
+		qua_manager.push_back_quaternion(QuaDef.LOOP_END);
 		return null; 
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 */
+	@Override public String visitSet_relation_proposition(@NotNull GrammarBParser.Set_relation_propositionContext ctx) { return visitChildren(ctx); }
 
 	/**
 	 * {@inheritDoc}
@@ -554,9 +496,6 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 		}
 		else if(ctx.CHAR() != null){
 			return_result = new CData(DataDef.CHAR, ctx.CHAR().getText());
-		}
-		else if(ctx.set() != null){
-			return_result = visitSetRD(ctx.set());
 		}
 		return return_result;
 	}
@@ -817,7 +756,7 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			for(int i = 0; i < ctx.type().size(); i++){
 				qua_manager.push_back_quaternion(
 						QuaDef.ARG,
-						new CData(DataDef.TYPE, DataDef.get_data_def_from_parser(ctx.type(i).start.getType())),
+						new CData(DataDef.INT, int_to_str(ctx.type(i).start.getType())),
 						new CData(DataDef.ID, ctx.ID(i).getText()),
 						ctx.ID(i).getSymbol().getLine()
 						);

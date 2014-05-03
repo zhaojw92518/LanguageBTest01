@@ -1,5 +1,3 @@
-package Parsers;
-
 // Generated from .\GrammarB.g4 by ANTLR 4.1
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
@@ -156,6 +154,14 @@ public class GrammarBBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
 	@Override public T visitNo_return_call(@NotNull GrammarBParser.No_return_callContext ctx) { return visitChildren(ctx); }
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 */
+	@Override public T visitSet_relation_proposition(@NotNull GrammarBParser.Set_relation_propositionContext ctx) { return visitChildren(ctx); }
 
 	/**
 	 * {@inheritDoc}

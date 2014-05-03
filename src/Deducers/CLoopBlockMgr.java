@@ -3,7 +3,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import ContextUI.CGlobalStaticSource;
+import Defines.DataDef;
 import Defines.LoopStackDef;
+import Parsers.CDataEntity;
 
 public class CLoopBlockMgr {
 	private LinkedList<CLoopBlockStack> loop_block_stacks = new LinkedList<CLoopBlockStack>();
@@ -85,9 +87,16 @@ public class CLoopBlockMgr {
 		return return_result;
 	}
 	
-	public void add_input_arg(String in_input_arg){
+	public void add_input_arg(String in_input_arg, DataDef in_type){
 		if(cur_loop_block != null){
-			cur_loop_block.input_args.put(in_input_arg, new CDeduceExpr(in_input_arg));
+			if(in_type == DataDef.VALUE){
+				cur_loop_block.input_args.put(in_input_arg, 
+						new CDataEntity(new CDeduceExpr(in_input_arg)));
+			}
+			else if(in_type == DataDef.SET){
+				cur_loop_block.input_args.put(in_input_arg,
+						new CDataEntity(new CSetStruct(in_input_arg)));
+			}
 		}
 	}
 	

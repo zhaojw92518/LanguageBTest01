@@ -1,19 +1,32 @@
 package Deducers;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import Defines.DataDef;
 import Defines.DeduceDef;
 import PackageMsg.COptionMsg;
 
 
 //A generation of value
 public class CValueGen {
-	int 	cir_gen = 0,//循环代数 
-			ass_gen = 0;//赋值代数
-	CDeduceExpr expr = null;
+	public int cir_gen = 0,//循环代数 
+				ass_gen = 0;//赋值代数
+	public CDeduceExpr expr = null;
+	public CSetStruct set_struct = null;
 	
+	/*
+	 * Constructor
+	 */
 	public CValueGen(CDeduceExpr in_expr){
 		this.expr = in_expr;
+	}
+	
+	public CValueGen(CSetStruct in_set){
+		this.set_struct = in_set;
 	}
 	
 	public CValueGen(int in_cir_gen, int in_ass_gen, CDeduceExpr in_expr){
@@ -22,10 +35,25 @@ public class CValueGen {
 		this.expr = in_expr;
 	}
 	
+	public CValueGen(int in_cir_gen, int in_ass_gen, CSetStruct in_set){
+		this.cir_gen = in_cir_gen;
+		this.ass_gen = in_ass_gen;
+		this.set_struct = in_set;
+	}
+	
+	/*
+	 * Copy Constructor
+	 */
+	
 	public CValueGen(CValueGen in_gen){
 		this.cir_gen = in_gen.cir_gen;
 		this.ass_gen = in_gen.ass_gen;
-		this.expr = in_gen.expr.dup();
+		if(in_gen.expr != null){
+			this.expr = in_gen.expr.dup();
+		}
+		if(in_gen.set_struct != null){
+			this.set_struct = in_gen.set_struct.dup();
+		}
 	}
 	
 	public String get_age_str(){
@@ -34,11 +62,16 @@ public class CValueGen {
 				(new Integer(ass_gen)).toString();
 	}
 	
-	public static String map_to_str(HashMap<String, Double> in_map){
+	public static String map_to_str(TreeMap<String, Double> in_map){
 		String return_result = "";
 		for(Map.Entry<String, Double> cur_entry: in_map.entrySet()){
 			if(cur_entry.getValue() > 0){
-				return_result += " + " + cur_entry.getValue().toString() + "*" + cur_entry.getKey();
+				if(cur_entry.getValue() == 1){
+					return_result = cur_entry.getKey();
+				}
+				else{
+					return_result += " + " + cur_entry.getValue().toString() + "*" + cur_entry.getKey();
+				}
 			}
 			else if(cur_entry.getValue() < 0){
 				return_result += cur_entry.getValue().toString() + "*" + cur_entry.getKey();
@@ -56,7 +89,18 @@ public class CValueGen {
 		return "[" + 
 				get_age_str() +
 				"]" +
-				map_to_str(expr.adv_toString());
+				get_data_str();
+	}
+	
+	public String get_data_str(){
+		String return_result = null;
+		if(expr != null){
+			return_result = get_expr_data();
+		}
+		else if(set_struct != null){
+			return_result = set_struct.toString();
+		}
+		return return_result;
 	}
 	
 	public String get_expr_data(){
@@ -115,5 +159,20 @@ public class CValueGen {
 		return "[" + left_gen.get_age_str() + "]" + 
 				in_option_msg.method.toString()+ "[" +   
 				right_gen.get_age_str() + "]";
+	}
+	
+	/*
+	 * UI
+	 */
+	
+	public DefaultMutableTreeNode get_tree_node(){
+		DefaultMutableTreeNode return_result = new DefaultMutableTreeNode(this.toString());
+		if(set_struct != null){
+			LinkedList<DefaultMutableTreeNode> cur_list = set_struct.get_tree_nodes();
+			for(DefaultMutableTreeNode cur_node: cur_list){
+				return_result.add(cur_node);
+			}
+		}
+		return return_result;
 	}
 }

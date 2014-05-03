@@ -3,6 +3,8 @@ package ContextUI;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
 import javax.swing.Box;
@@ -47,6 +49,17 @@ public class CInOutIdPanel extends JPanel {
 			}
 		});
 		output_table.setRowHeight(25);
+		
+		output_table.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				if(e.getClickCount() == 2){
+					int	cur_row = output_table.rowAtPoint(e.getPoint()),
+						cur_col = output_table.columnAtPoint(e.getPoint())	;
+					new CShowStrFrame((String)output_table.getValueAt(cur_row, cur_col));
+				}
+			}
+		});
+		
 		iterations_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		iterations_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			

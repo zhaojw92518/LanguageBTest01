@@ -1,12 +1,23 @@
 package Deducers;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import Defines.DataDef;
 
 
 public class CData {
-	public DataDef type = DataDef.NO_USE;
+	public DataDef type = DataDef.NO_USE, type_data = DataDef.NO_USE;
 	public String data_str = null;
 	
+	public HashSet<CData> set_list = new HashSet<CData>();
+	
 	public CData() {}
+	
+	public CData(DataDef in_type, DataDef in_type_data){
+		type = in_type;
+		type_data = in_type_data;
+	}
 	
 	public CData(DataDef in_type, String in_data_str) {
 		type = in_type;
@@ -14,7 +25,14 @@ public class CData {
 	}
 	
 	public String toString(){
-		return data_str;
+		if(type == DataDef.SET){
+			return set_list.toString();
+		}
+		else if(type == DataDef.TYPE){
+			return type_data.toString();
+		}
+		else 
+			return data_str;
 	}
 	
 	public String get_type_str(){
@@ -38,4 +56,10 @@ public class CData {
 				&& this.data_str.equals(((CData)in_data).data_str)
 				&& this.type.equals(((CData)in_data).type);
 	}
+	
+	public void add_set_element(CData in_data){
+		set_list.add(in_data);
+	}
+	
+
 }

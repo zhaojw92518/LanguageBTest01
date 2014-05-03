@@ -4,14 +4,16 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import ContextUI.CGlobalStaticSource;
+import Defines.DataDef;
 import Defines.DeduceDef;
+import Parsers.CDataEntity;
 
 public class CLoopBlock {
 	public static final int INIT = -1;
 	
-	public HashMap<String, CDeduceExpr> 
-		input_args = new HashMap<String, CDeduceExpr>(), 
-		output_args = new HashMap<String, CDeduceExpr>();
+	public HashMap<String, CDataEntity> 
+		input_args = new HashMap<String, CDataEntity>(), 
+		output_args = new HashMap<String, CDataEntity>();
 	public LinkedList<CDeduceExpr> logical_stats = new LinkedList<CDeduceExpr>();
 	public int begin_qua = CLoopBlock.INIT, end_qua = CLoopBlock.INIT;
 	
@@ -26,7 +28,7 @@ public class CLoopBlock {
 	public String[] get_input_strs(){
 		String[] return_result = new String[input_args.size()];
 		int i = 0;
-		for(Map.Entry<String, CDeduceExpr> cur_entry: input_args.entrySet()){
+		for(Map.Entry<String, CDataEntity> cur_entry: input_args.entrySet()){
 			return_result[i] = cur_entry.getKey();
 			++i;
 		}
@@ -37,7 +39,7 @@ public class CLoopBlock {
 	public String[] get_output_strs(){
 		String[] return_result = new String[output_args.size()];
 		int i = 0;
-		for(Map.Entry<String, CDeduceExpr> cur_entry: output_args.entrySet()){
+		for(Map.Entry<String, CDataEntity> cur_entry: output_args.entrySet()){
 			return_result[i] = cur_entry.getKey();
 			++i;
 		}
@@ -51,8 +53,9 @@ public class CLoopBlock {
 	private void expr_replace(CDeduceExpr in_expr){
 		if(in_expr.left_data != null){
 			if(in_expr.left_data.type == DeduceDef.DATA &&
-					input_args.containsKey(in_expr.left_data.data)){
-				in_expr.left_data = input_args.get(in_expr.left_data.data);
+					input_args.containsKey(in_expr.left_data.data) &&
+					input_args.get(in_expr.left_data.data).type == DataDef.VALUE){
+				in_expr.left_data = input_args.get(in_expr.left_data.data).expr;
 			}
 			else{
 				expr_replace(in_expr.left_data);
@@ -61,12 +64,55 @@ public class CLoopBlock {
 		
 		if(in_expr.right_data != null){
 			if(in_expr.right_data.type == DeduceDef.DATA &&
-					input_args.containsKey(in_expr.right_data.data)){
-				in_expr.right_data = input_args.get(in_expr.right_data.data);
+					input_args.containsKey(in_expr.right_data.data) && 
+					input_args.get(in_expr.right_data.data).type == DataDef.VALUE){
+				in_expr.right_data = input_args.get(in_expr.right_data.data).expr;
 			}
 			else{
 				expr_replace(in_expr.right_data);
 			}
+		}
+	}
+	
+	private void expr_replace(CSetStruct in_set_struct){
+		if(in_set_struct.left_set_struct != null){
+			if(in_set_struct.left_set_struct.type == DeduceDef.DATA){
+				if(in_set_struct.left_set_struct.set_id != null && 
+						input_args.containsKey(in_set_struct.left_set_struct.set_id)){
+					in_set_struct.left_set_struct = 
+							input_args.get(in_set_struct.left_set_struct).set_struct;
+				}
+				else{
+					for(CDeduceTerm cur_term: in_set_struct.left_set_struct.term_set){
+						expr_replace(cur_term.get_cur_expr());
+					}
+				}
+			}
+			expr_replace(in_set_struct.left_set_struct);
+		}
+		if(in_set_struct.right_set_struct != null){
+			if(in_set_struct.right_set_struct.type == DeduceDef.DATA){
+				if(in_set_struct.right_set_struct.set_id != null && 
+						input_args.containsKey(in_set_struct.right_set_struct.set_id)){
+					in_set_struct.right_set_struct = 
+							input_args.get(in_set_struct.right_set_struct).set_struct;
+				}
+				else{
+					for(CDeduceTerm cur_term: in_set_struct.right_set_struct.term_set){
+						expr_replace(cur_term.get_cur_expr());
+					}
+				}
+			}
+			expr_replace(in_set_struct.right_set_struct);
+		}
+	}
+	
+	private void expr_replace(CDataEntity in_entity){
+		if(in_entity.type == DataDef.VALUE){
+			expr_replace(in_entity.expr);
+		}
+		else if(in_entity.type == DataDef.SET){
+			expr_replace(in_entity.set_struct);
 		}
 	}
 	
@@ -94,6 +140,31 @@ public class CLoopBlock {
 		}
 	}
 	
+	private void iterations_replace(CSetStruct in_set_struct){
+		if(in_set_struct.type == DeduceDef.DATA){
+			for(CDeduceTerm cur_term: in_set_struct.term_set){
+				iterations_replace(cur_term.get_cur_expr());
+			}
+		}
+		else{
+			if(in_set_struct.left_set_struct != null){
+				iterations_replace(in_set_struct.left_set_struct);
+			}
+			if(in_set_struct.right_set_struct != null){
+				iterations_replace(in_set_struct.right_set_struct);
+			}
+		}
+	}
+	
+	private void iterations_replace(CDataEntity in_entity){
+		if(in_entity.type == DataDef.VALUE){
+			iterations_replace(in_entity.expr);
+		}
+		else if(in_entity.type == DataDef.SET){
+			iterations_replace(in_entity.set_struct);
+		}
+	}
+	
 	/**
 	 * 代入第N代的结果
 	 * @param in_id_value_map
@@ -103,20 +174,17 @@ public class CLoopBlock {
 		HashMap<String, String> return_result = new HashMap<String, String>();
 		CExprInputor expr_inputor = new CExprInputor();
 		for(Map.Entry<String, String> cur_entry: in_id_value_map.entrySet()){
-			CDeduceExpr cur_expr = expr_inputor.get_expr(cur_entry.getValue());
-			iterations_replace(cur_expr);
+			CDataEntity cur_entity = expr_inputor.get_expr(cur_entry.getValue());
+			iterations_replace(cur_entity);
 			
 			CDeduceExpr iterations_backup = new CDeduceExpr(iterations_input);//备份原始的input
 			iterations_input.assign(new CDeduceExpr(DeduceDef.ADD, iterations_backup, new CDeduceExpr("1")));//添加N + 1代
-			//Debug
-			String temp_str = CValueGen.map_to_str(cur_expr.adv_toString());
-			System.out.println(temp_str);
-			//Debug end
+			String temp_str = cur_entity.toString();
 			return_result.put(cur_entry.getKey(), temp_str);//将N+1代的值求出
 			iterations_input.assign(iterations_backup);//还原为第N代
 			
-			expr_replace(cur_expr);
-			output_args.put(cur_entry.getKey(), cur_expr);
+			expr_replace(cur_entity);
+			output_args.put(cur_entry.getKey(), cur_entity);
 		}
 		return return_result;
 	}
@@ -152,7 +220,7 @@ public class CLoopBlock {
 	
 	public void input_iterations(String in_iterations_input){
 		CExprInputor expr_inputor = new CExprInputor();
-		iterations_input = expr_inputor.get_expr(in_iterations_input);
+		iterations_input = expr_inputor.get_expr(in_iterations_input).expr;
 	}
 	
 	public void replace_initial_condition(){
@@ -164,7 +232,7 @@ public class CLoopBlock {
 	 */
 	public void print_all_input_args(){
 		System.out.print("input: ");
-		for(Map.Entry<String, CDeduceExpr> cur_entry: input_args.entrySet()){
+		for(Map.Entry<String, CDataEntity> cur_entry: input_args.entrySet()){
 			System.out.print(cur_entry.getKey());
 			System.out.print("  ");
 		}
@@ -173,7 +241,7 @@ public class CLoopBlock {
 	
 	public void print_all_output_args(){
 		System.out.print("output: ");
-		for(Map.Entry<String, CDeduceExpr> cur_entry: output_args.entrySet()){
+		for(Map.Entry<String, CDataEntity> cur_entry: output_args.entrySet()){
 			System.out.print(cur_entry.getKey());
 			System.out.print("  ");
 		}

@@ -1,5 +1,5 @@
 package Deducers;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,9 @@ public class CDeduceExpr {
 	
 	public CDeduceExpr dup(){
 		CDeduceExpr return_result = new CDeduceExpr();
-		return_result.data = new String(this.data);
+		if(this.data != null){
+			return_result.data = new String(this.data);
+		}
 		return_result.type = this.type;
 		if(this.left_data != null){
 			return_result.left_data = this.left_data.dup();
@@ -104,7 +106,7 @@ public class CDeduceExpr {
 		return return_result;
 	}
 	
-	public String map_to_str(HashMap<String, Double> in_map){
+	public String map_to_str(TreeMap<String, Double> in_map){
 		String return_result = "";
 		for(Map.Entry<String, Double> cur_entry: in_map.entrySet()){
 			if(cur_entry.getValue() > 0){
@@ -128,7 +130,7 @@ public class CDeduceExpr {
 	 * @param in_map_a
 	 * @param in_map_b
 	 */
-	private void hashmap_add_merge(HashMap<String, Double> in_map_a, HashMap<String, Double> in_map_b){
+	private void TreeMap_add_merge(TreeMap<String, Double> in_map_a, TreeMap<String, Double> in_map_b){
 		for(Map.Entry<String, Double> cur_entry: in_map_b.entrySet()){
 			if(in_map_a.containsKey(cur_entry.getKey())){
 				in_map_a.put(
@@ -148,7 +150,7 @@ public class CDeduceExpr {
 	 * @param in_map_a
 	 * @param in_map_b
 	 */
-	private void hashmap_sub_merge(HashMap<String, Double> in_map_a, HashMap<String, Double> in_map_b){
+	private void TreeMap_sub_merge(TreeMap<String, Double> in_map_a, TreeMap<String, Double> in_map_b){
 		for(Map.Entry<String, Double> cur_entry: in_map_b.entrySet()){
 			if(in_map_a.containsKey(cur_entry.getKey())){
 				in_map_a.put(
@@ -168,8 +170,8 @@ public class CDeduceExpr {
 	 * @param in_map_a
 	 * @param in_map_b
 	 */
-	private HashMap<String, Double> hashmap_mul_merge(HashMap<String, Double> in_map_a, HashMap<String, Double> in_map_b){
-		HashMap<String, Double> cur_map = new HashMap<String, Double>();
+	private TreeMap<String, Double> TreeMap_mul_merge(TreeMap<String, Double> in_map_a, TreeMap<String, Double> in_map_b){
+		TreeMap<String, Double> cur_map = new TreeMap<String, Double>();
 		for(Map.Entry<String, Double> left_entry: in_map_a.entrySet()){
 			for(Map.Entry<String, Double> right_entry: in_map_b.entrySet()){
 				String cur_str = null;
@@ -201,8 +203,8 @@ public class CDeduceExpr {
 	 * @param in_map_a
 	 * @param in_map_b
 	 */
-	private HashMap<String, Double> hashmap_div_merge(HashMap<String, Double> in_map_a, HashMap<String, Double> in_map_b){
-		HashMap<String, Double> cur_map = null;
+	private TreeMap<String, Double> TreeMap_div_merge(TreeMap<String, Double> in_map_a, TreeMap<String, Double> in_map_b){
+		TreeMap<String, Double> cur_map = null;
 		if(in_map_b.size() == 1 && in_map_b.containsKey("1")){
 			cur_map = in_map_a;
 			for(Map.Entry<String, Double> cur_entry: in_map_a.entrySet()){
@@ -210,7 +212,7 @@ public class CDeduceExpr {
 			}
 		}
 		else{
-			cur_map = new HashMap<String, Double>();
+			cur_map = new TreeMap<String, Double>();
 			String right_str = map_to_str(in_map_b);
 			for(Map.Entry<String, Double> cur_entry: in_map_a.entrySet()){
 				cur_map.put(cur_entry.getKey() + "/(" + right_str + ")", cur_entry.getValue());
@@ -219,7 +221,7 @@ public class CDeduceExpr {
 		return cur_map;
 	}
 	
-	private void check_hashmap(HashMap<String, Double> in_map){
+	private void check_treemap(TreeMap<String, Double> in_map){
 		//处理0
 		if(in_map.size() == 1 && in_map.containsKey("0")){
 			in_map.put("0", 0.0);
@@ -244,10 +246,23 @@ public class CDeduceExpr {
 		}
 	}
 	
-	public HashMap<String, Double> adv_toString(){
-		HashMap<String, Double> return_result = null;
+	private String get_set_left_arg_str(CDeduceExpr in_expr){
+		String return_result = null;
+		if(in_expr.type == DeduceDef.SET_LEFT_ARG){
+			if(in_expr.right_data == null){
+				return_result = left_data.data;
+			}
+			else if(in_expr.right_data.type == DeduceDef.SET_LEFT_ARG){
+				return_result = left_data.data + "," + get_set_left_arg_str(right_data);
+			}
+		}
+		return return_result;
+	}
+	
+	public TreeMap<String, Double> adv_toString(){
+		TreeMap<String, Double> return_result = null;
 		if(this.type == DeduceDef.DATA){
-			return_result = new HashMap<String, Double>();
+			return_result = new TreeMap<String, Double>();
 			if(this.data.charAt(0) >= '0' && this.data.charAt(0) <= '9'){
 				return_result.put("1", new Double(this.data));
 			}
@@ -261,9 +276,15 @@ public class CDeduceExpr {
 				cur_entry.setValue(-cur_entry.getValue());
 			}
 		}
-		else if(this.type.get_level() == 0){
+		else if(this.type == DeduceDef.SET_ELE){
+			return_result = new TreeMap<String, Double>();
+			String cur_str = get_set_left_arg_str(this.left_data) + " | ";
+			cur_str += CValueGen.map_to_str(this.right_data.adv_toString());
+			return_result.put(cur_str, 1.0);
+		}
+		else if(this.type.get_level() == 0 && this.type.get_level() == -1){
 			//如果是条件语句
-			return_result = new HashMap<String, Double>();
+			return_result = new TreeMap<String, Double>();
 			return_result.put(
 					"(" +
 					map_to_str(left_data.adv_toString()) + 
@@ -275,25 +296,25 @@ public class CDeduceExpr {
 					1.0);
 		}
 		else{
-			HashMap<String, Double> left_map = left_data.adv_toString(),
+			TreeMap<String, Double> left_map = left_data.adv_toString(),
 					right_map = right_data.adv_toString();
 			if(this.type == DeduceDef.ADD){
-				hashmap_add_merge(left_map, right_map);
+				TreeMap_add_merge(left_map, right_map);
 				return_result = left_map;
 			}
 			else if(this.type == DeduceDef.SUB){
-				hashmap_sub_merge(left_map, right_map);
+				TreeMap_sub_merge(left_map, right_map);
 				return_result = left_map;
 			}
 			else if(this.type == DeduceDef.MUL){
-				return_result = hashmap_mul_merge(left_map, right_map);
+				return_result = TreeMap_mul_merge(left_map, right_map);
 			}
 			else if(this.type == DeduceDef.DIV){
-				return_result = hashmap_div_merge(left_map, right_map);
+				return_result = TreeMap_div_merge(left_map, right_map);
 			}
 			
 		}
-		check_hashmap(return_result);
+		check_treemap(return_result);
 		return return_result;
 	}
 }

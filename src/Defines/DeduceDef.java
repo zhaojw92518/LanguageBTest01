@@ -10,6 +10,15 @@ public enum DeduceDef {
 	REV,
 	RET,
 	
+	//集合不定数量元素表示
+	SET_ELE,
+	SET_LEFT_ARG,
+	
+	//集合运算
+	UNI,
+	INT,
+	SUB_S,
+	
 	//level 2
 	MUL,
 	DIV,
@@ -20,9 +29,17 @@ public enum DeduceDef {
 	
 	//level 0
 	LES,
+	ELES,
 	EQU,
 	GRE,
-	UEQU;
+	EGRE,
+	UEQU,
+	
+	
+	NOT,
+	AND,
+	OR,
+	ENT;//蕴含
 	
 	private static int[] level_array = new int[100];
 	public static void level_array_init(){
@@ -33,9 +50,16 @@ public enum DeduceDef {
 		level_array[SUB.ordinal()] = 1;
 		
 		level_array[LES.ordinal()] = 0;
+		level_array[ELES.ordinal()] = 0;
 		level_array[EQU.ordinal()] = 0;
 		level_array[GRE.ordinal()] = 0;
+		level_array[EGRE.ordinal()] = 0;
 		level_array[UEQU.ordinal()] = 0;
+		
+		level_array[NOT.ordinal()] = -1;
+		level_array[AND.ordinal()] = -1;
+		level_array[OR.ordinal()] = -1;
+		level_array[ENT.ordinal()] = -1;
 	}
 	
 	public int get_level(){
@@ -67,6 +91,27 @@ public enum DeduceDef {
 		}
 		else if(equals(UEQU)){
 			return_result = " != ";
+		}
+		else if(equals(UNI)){
+			return_result = "\\-/";
+		}
+		else if(equals(INT)){
+			return_result = "/-\\";
+		}
+		else if(equals(SUB_S)){
+			return_result = "--";
+		}
+		else if(equals(NOT)){
+			return_result = "~";
+		}
+		else if(equals(ADD)){
+			return_result = "/\\";
+		}
+		else if(equals(OR)){
+			return_result = "\\/";
+		}
+		else if(equals(ENT)){
+			return_result = "->";
 		}
 		return return_result;
 	}

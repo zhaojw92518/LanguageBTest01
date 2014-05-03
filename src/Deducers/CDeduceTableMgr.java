@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import Defines.DataDef;
 import Defines.DeduceDef;
 import PackageMsg.COptionMsg;
 
@@ -106,8 +107,17 @@ public class CDeduceTableMgr {
 	public CDeduceExpr get_cur_expr(String in_id){
 		CDeduceExpr return_result = null;
 		CDeduceTerm cur_term = this.get_term(in_id);
-		if(cur_term != null){
-			return_result = cur_term.get_cur_data();
+		if(cur_term != null && cur_term.get_type() == DataDef.VALUE){
+			return_result = cur_term.get_cur_expr();
+		}
+		return return_result;
+	}
+	
+	public CSetStruct get_cur_set_struct(String in_id){
+		CSetStruct return_result = null;
+		CDeduceTerm cur_term = this.get_term(in_id);
+		if(cur_term != null && cur_term.get_type() == DataDef.SET){
+			return_result = cur_term.get_cur_set();
 		}
 		return return_result;
 	}
@@ -130,13 +140,29 @@ public class CDeduceTableMgr {
 	public CDeduceTable get_table_across_id(CData in_id_data){
 		CDeduceTable return_result = this.if_have_term(in_id_data.data_str);
 		if(return_result == null && CData.judge_temp(in_id_data)){
-			this.create_local_term(in_id_data);
+			this.create_local_term(in_id_data, DataDef.VALUE);
 			return_result = this.local_tables.getLast();
 		}
 		else if(return_result == null){
 			//TODO 对未声明变量的处理
 		}
 		return return_result;
+	}
+	
+	public CDeduceTable get_table_across_id_set(CData in_id_data){
+		CDeduceTable return_result = this.if_have_term(in_id_data.data_str);
+		if(return_result == null && CData.judge_temp(in_id_data)){
+			this.create_local_term(in_id_data, DataDef.SET);
+			return_result = this.local_tables.getLast();
+		}
+		else if(return_result == null){
+			//TODO 对未声明变量的处理
+		}
+		return return_result;
+	}
+	
+	public DataDef get_id_type(CData in_id_data){
+		return this.get_term(in_id_data).get_type();
 	}
 	
 	/*
@@ -160,6 +186,13 @@ public class CDeduceTableMgr {
 		}
 	}
 	
+	public void set_term(CData in_id_data, CSetStruct in_set_struct){
+		CDeduceTable cur_table = get_table_across_id(in_id_data);
+		if(cur_table != null){
+			cur_table.set_term(in_id_data.data_str, in_set_struct);
+		}
+	}
+	
 	/**
 	 * 由于in_id_data必定源自于符号表中存在的值，所以在此不检查
 	 * @param in_id_data
@@ -170,29 +203,34 @@ public class CDeduceTableMgr {
 		cur_table.set_cir_term(in_id_data.data_str, in_expr);
 	}
 	
+	public void set_cir_term(CData in_id_data, CSetStruct in_set_struct){
+		CDeduceTable cur_table = get_table_across_id(in_id_data);
+		cur_table.set_cir_term(in_id_data.data_str, in_set_struct);
+	}
+	
 	/*
 	 * group of create
 	 */
 	
-	public void create_global_term(String in_id){
-		global_table.create_new_term(in_id);
+	public void create_global_term(String in_id, DataDef in_type){
+		global_table.create_new_term(in_id, in_type);
 	}
 	
-	public void create_global_term(CData in_data){
-		this.create_global_term(in_data.data_str);
+	public void create_global_term(CData in_data, DataDef in_type){
+		this.create_global_term(in_data.data_str, in_type);
 	}
 	
-	public void create_local_term(String in_id){
+	public void create_local_term(String in_id, DataDef in_type){
 		if(global_if_have_term(in_id)){
 			//TODO 处理声明局部变量时与全局变量重名
 		}
 		else{
-			local_tables.getLast().create_new_term(in_id);
+			local_tables.getLast().create_new_term(in_id, in_type);
 		}
 	}
 	
-	public void create_local_term(CData in_data){
-		this.create_local_term(in_data.data_str);
+	public void create_local_term(CData in_data, DataDef in_type){
+		this.create_local_term(in_data.data_str, in_type);
 	}
 	
 	/*
@@ -259,7 +297,7 @@ public class CDeduceTableMgr {
 			return_result = 
 					in_id_data.data_str + 
 					"[" + cur_term.get_cur_age().toString() + "] = " + 
-					cur_term.get_cur_data().toString();
+					cur_term.get_cur_expr().toString();
 		}
 		return return_result;
 	}

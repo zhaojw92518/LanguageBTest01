@@ -174,8 +174,12 @@ PROPOSITION_SYMBOL_3:	'\\/'	;
 PROPOSITION_SYMBOL_4:	'->'	;
 ELEMENT_SET_SYMBOL:	':' | '!:'	;
 //SET_RELATION_SYMBOL:	'<' | '<=' | '>=' | '>' | '==' | '!='	;
-SET_SYMBOL_1:	'/-\\' | '\\-/'	;
+SET_SYMBOL_1:	SET_SYMBOL_UNI | SET_SYMBOL_INT	;
 SET_SYMBOL_2:	'--'	;
+
+SET_SYMBOL_UNI: '\\-/';
+SET_SYMBOL_INT: '/-\\';
+
 
 GRE:	'>'		;
 EGRE:	'>='	;
