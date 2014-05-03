@@ -1,0 +1,98 @@
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int factor(int m){
+		ATTRIBUTE
+			int x,y,z,a;
+		a = 0;
+		z = 0;	
+		x = 1;	
+		while(x != m){
+			y = x;
+			z = z + y;
+			x = x + 1;
+		}
+		return z + 6;
+	}
+END
+
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int factor(int m){
+		ATTRIBUTE
+			int x,y,z,a;
+		a = 0;
+		z = 0;	
+		x = 1;	
+		while(x != m){
+			if(a > 0){
+				y = x;
+			}
+			else{
+				y = 1;
+			}
+			z = z + y;
+			x = x + 1;
+		}
+		return z + 6;
+	}
+END
+
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int addset(int m, set s){
+		ATTRIBUTE
+			int x;
+		x = m + 5;
+		s = {1, 2, 3};
+		s = s \-/ x; 
+		return 0;
+	}
+END
+
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int factor(int m){
+		ATTRIBUTE
+			int x,y,z,a;
+		if(m > 0){
+			m = m - 1;
+		}
+		else{
+			m = m + 1;
+		}
+		if(m > 0){
+			m = m - 1;
+		}
+		else{
+			m = m + 1;
+		}
+		if(m > 0){
+			m = m - 1;
+		}
+		else{
+			m = m + 1;
+		}
+		if(m > 0){
+			m = m - 1;
+		}
+		else{
+			m = m + 1;
+		}
+		if(m > 0){
+			m = m - 1;
+		}
+		else{
+			m = m + 1;
+		}
+		return m;
+	}
+END
+

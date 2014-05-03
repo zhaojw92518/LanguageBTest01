@@ -1,0 +1,1 @@
+antlr4.bat -no-listener -visitor .\GrammarB.g4
