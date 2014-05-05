@@ -96,3 +96,20 @@ OPERATIONS
 	}
 END
 
+MACHINE List (int q)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int addset(int m, set s){
+		ATTRIBUTE
+			int x;
+		x = 1;
+		while(x != m){
+			s = s \-/ {x};
+			x = x + 1;
+		}
+		s = s -- {4};
+		return 0;
+	}
+END
+

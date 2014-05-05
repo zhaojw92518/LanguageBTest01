@@ -42,8 +42,13 @@ public class CSetStruct {
 		CSetStruct return_result = null;
 		if(this.type == DeduceDef.DATA){
 			return_result = new CSetStruct(DeduceDef.DATA);
-			for(CDeduceTerm cur_term: this.term_set){
-				return_result.term_set.add(new CDeduceTerm(cur_term));
+			if(this.set_id != null){
+				return_result.set_id = new String(this.set_id);
+			}
+			else{
+				for(CDeduceTerm cur_term: this.term_set){
+					return_result.term_set.add(new CDeduceTerm(cur_term));
+				}
 			}
 		}
 		else{

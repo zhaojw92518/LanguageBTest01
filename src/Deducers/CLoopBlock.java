@@ -177,7 +177,7 @@ public class CLoopBlock {
 			CDataEntity cur_entity = expr_inputor.get_expr(cur_entry.getValue());
 			iterations_replace(cur_entity);
 			
-			CDeduceExpr iterations_backup = new CDeduceExpr(iterations_input);//备份原始的input
+			CDeduceExpr iterations_backup = iterations_input.dup();//备份原始的input
 			iterations_input.assign(new CDeduceExpr(DeduceDef.ADD, iterations_backup, new CDeduceExpr("1")));//添加N + 1代
 			String temp_str = cur_entity.toString();
 			return_result.put(cur_entry.getKey(), temp_str);//将N+1代的值求出
@@ -186,14 +186,32 @@ public class CLoopBlock {
 			expr_replace(cur_entity);
 			output_args.put(cur_entry.getKey(), cur_entity);
 		}
+		iterations_input.assign(new CDeduceExpr(DeduceDef.SUB, iterations_input.dup(), new CDeduceExpr("1")));//赋值为第N - 1代
+		iterations_count = iterations_input;
 		return return_result;
 	}
-
+	
+	public String get_latter_condition_deduce_str(){
+		String return_result = new String();
+		return_result += "{ latter condition }" + CGlobalStaticSource.endl_str;
+		return_result += "{" + condition.get_latter_gen_data_str() + "}";
+		return_result += CGlobalStaticSource.endl_str;
+		return return_result;
+	}
+	
 	public String get_condition_deduce_str(){
 		String return_result = new String();
 		return_result += "{" + condition.get_cur_gen().get_expr_data() + "}->";
 		return_result += CGlobalStaticSource.endl_str;
 		return_result += "{ next loop }" + CGlobalStaticSource.endl_str;
+		return return_result;
+	}
+	
+	public String get_cur_condition_deduce_str(){
+		String return_result = new String();
+		return_result += "{ current condition }" + CGlobalStaticSource.endl_str;
+		return_result += "{" + condition.get_cur_gen_data_str() + "}";
+		return_result += CGlobalStaticSource.endl_str;
 		return return_result;
 	}
 	

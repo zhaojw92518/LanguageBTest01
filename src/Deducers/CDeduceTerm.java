@@ -187,6 +187,17 @@ public class CDeduceTerm {
 		return get_cur_gen().get_data_str();
 	}
 	
+	public String get_latter_gen_data_str(){
+		String return_result = null;
+		if(data_family.size() > 1){
+			return_result = data_family.get(data_family.size() - 2).get_data_str();
+		}
+		else{
+			return_result = new String();
+		}
+		return return_result;
+	}
+	
 	public String get_cur_gen_age_str(){
 		return get_cur_gen().get_age_str();
 	}

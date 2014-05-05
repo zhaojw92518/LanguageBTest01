@@ -1,16 +1,18 @@
-MACHINE List (int q)
+MACHINE List (int s)
 INVARIANT
 ATTRIBUTE
 OPERATIONS
-	int addset(int m, set s){
+	int factor(int m){
 		ATTRIBUTE
-			int x;
-		x = 1;
+			int x,y,z,a;
+		a = 0;
+		z = 0;	
+		x = 1;	
 		while(x != m){
-			s = s \-/ {x};
+			y = x;
+			z = z + y;
 			x = x + 1;
 		}
-		s = s -- {4};
-		return 0;
+		return z + 6;
 	}
 END

@@ -154,15 +154,31 @@ public class ExprVisitor extends GrammarBBaseVisitor<CDataEntity> {
 	
 	@Override public CDataEntity visitSet_term_0(@NotNull GrammarBParser.Set_term_0Context ctx){
 		CDataEntity return_result = null;
-		if(ctx.ID() != null){
-			CSetStruct temp_set_struct = new CSetStruct(ctx.ID().getText());
-			return_result = new CDataEntity(temp_set_struct);
-		}
-		else if(ctx.element() != null && ctx.element().size() != 0){
+		
+		if(ctx.element() != null && ctx.element().size() != 0){
 			return_result = new CDataEntity(new CSetStruct(DeduceDef.DATA));
 			for(int i = 0; i < ctx.element().size(); i++){
 				return_result.set_struct.add(new CDeduceTerm(visitElement(ctx.element(i)).expr));
 			}
+		}
+		else if(ctx.proposition() != null){
+			if(ctx.ID() != null){
+				CSetStruct temp_set_struct = new CSetStruct(DeduceDef.DATA);
+				CDeduceExpr temp_expr = new CDeduceExpr(
+						DeduceDef.SET_ELE, 
+						new CDeduceExpr(
+								DeduceDef.SET_LEFT_ARG, 
+								new CDeduceExpr(ctx.ID().getText()), 
+								null
+								), 
+						visitProposition(ctx.proposition()).expr);
+				temp_set_struct.add(new CDeduceTerm(temp_expr));
+				return_result = new CDataEntity(temp_set_struct);
+			}
+		}
+		else if(ctx.ID() != null){
+			CSetStruct temp_set_struct = new CSetStruct(ctx.ID().getText());
+			return_result = new CDataEntity(temp_set_struct);
 		}
 		return return_result;
 	}
@@ -204,7 +220,7 @@ public class ExprVisitor extends GrammarBBaseVisitor<CDataEntity> {
 		CDataEntity 	change_1_result = visitChange_1(ctx.change_1()),
 						change_4_result = visitChange_4(ctx.change_4());
 		
-		if(change_1_result != null && change_4_result == null){
+		if(change_1_result != null){
 			return change_1_result;
 		}
 		else
@@ -214,12 +230,25 @@ public class ExprVisitor extends GrammarBBaseVisitor<CDataEntity> {
 	@Override public CDataEntity visitChange_1(@NotNull GrammarBParser.Change_1Context ctx){
 		CDataEntity return_result = null;
 		if(ctx.change_2() != null){
-			
+			return_result = visitChange_1_temp_1(ctx.change_1_temp_1());
+			if(ctx.PROPOSITION_SYMBOL_1() != null && !ctx.PROPOSITION_SYMBOL_1().isEmpty()){
+				if(ctx.PROPOSITION_SYMBOL_1().size() % 2 == 1){
+					return_result = new CDataEntity(
+							new CDeduceExpr(
+									DeduceDef.NOT,
+									return_result.expr,
+									null
+									)
+							);
+				}
+			}
+			return_result = visitChange_2(ctx.change_2(), return_result);
 		}
 		else if(ctx.change_3() != null){
 			
 		}
 		else if(ctx.proposition() != null){
+			
 		} 
 		return return_result;
 	}

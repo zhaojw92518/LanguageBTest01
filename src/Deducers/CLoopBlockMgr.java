@@ -153,7 +153,15 @@ public class CLoopBlockMgr {
 	public String get_cur_loop_block_condition_str(){
 		String return_result = new String();
 		if(cur_loop_block != null){
-			 return_result = cur_loop_block.get_condition_deduce_str();
+			 return_result = cur_loop_block.get_cur_condition_deduce_str();
+		}
+		return return_result;
+	}
+	
+	public String get_cur_loop_block_latter_condition_str(){
+		String return_result = new String();
+		if(cur_loop_block != null){
+			 return_result = cur_loop_block.get_latter_condition_deduce_str();
 		}
 		return return_result;
 	}

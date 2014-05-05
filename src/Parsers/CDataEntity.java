@@ -40,7 +40,7 @@ public class CDataEntity {
 			return_result = CValueGen.map_to_str(expr.adv_toString());
 		}
 		else if(type == DataDef.SET){
-			return_result = set_struct.get_set_result_str();
+			return_result = set_struct.toString();
 		}
 		return return_result;
 	}

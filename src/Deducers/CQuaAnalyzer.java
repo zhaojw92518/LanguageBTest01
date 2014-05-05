@@ -7,7 +7,6 @@ import java.util.Map;
 
 import ContextUI.CContextFrame;
 import ContextUI.CGlobalSemp;
-import ContextUI.CGlobalStaticSource;
 import Defines.DataDef;
 import Defines.DeduceDef;
 import Defines.DeduceResultDef;
@@ -645,7 +644,7 @@ public class CQuaAnalyzer {
 		get_cur_qua();
 		if(check_cur_qua_type(QuaDef.FUNC_END)){
 			cur_state = QuaDef.LOOP_CHANGE;
-			loop_context_backup = cur_table_magr;
+			loop_context_backup = new CDeduceTableMgr(cur_table_magr);
 		}
 		else if(check_cur_qua_type(QuaDef.LOOP)){
 			loop_block_mgr.add_begin_index(cur_qua_index);
@@ -718,7 +717,10 @@ public class CQuaAnalyzer {
 	private void update_context_frame(){
 		context_frame.update(cur_table_magr.get_tree_nodes(context_frame.get_option_msg()));
 
-		context_frame.set_deduce_text(loop_block_mgr.get_deduce_strs() + loop_block_mgr.get_cur_loop_block_condition_str());
+		context_frame.set_deduce_text(
+				loop_block_mgr.get_cur_loop_block_condition_str() + 
+				loop_block_mgr.get_deduce_strs() 
+				);
 		context_frame.update_iterations(loop_block_mgr.get_cur_block().get_iterations_count_str(), loop_block_mgr.get_cur_block().get_iterations_input_str());
 		
 		if(in_out_id_panel_update_ctrl){
@@ -755,10 +757,10 @@ public class CQuaAnalyzer {
 			context_frame.update_output_values(n_plus_one_map);
 			for(Map.Entry<String, CDataEntity> cur_entry: loop_block_mgr.get_cur_block().output_args.entrySet()){
 				if(cur_entry.getValue().type == DataDef.VALUE){
-					set_term(new CData(DataDef.ID, cur_entry.getKey()), cur_entry.getValue().expr);
+					set_cir_term(new CData(DataDef.ID, cur_entry.getKey()), cur_entry.getValue().expr);
 				}
 				else if(cur_entry.getValue().type == DataDef.SET){
-					set_term(new CData(DataDef.ID, cur_entry.getKey()), cur_entry.getValue().set_struct);
+					set_cir_term(new CData(DataDef.ID, cur_entry.getKey()), cur_entry.getValue().set_struct);
 				}
 				
 			}
@@ -785,6 +787,8 @@ public class CQuaAnalyzer {
 		else if(deduce_result == DeduceResultDef.CONFIRM){
 			//再迭代一遍
 			cur_qua_index = loop_block_mgr.get_cur_loop_block_begin();
+			loop_block_mgr.clear_deduce_strs();
+			loop_block_mgr.get_cur_block().increase_iterations();
 			cur_state = QuaDef.LOOP_GEN;
 			if_confirm = true;
 		}
@@ -799,15 +803,24 @@ public class CQuaAnalyzer {
 	}
 	
 	private void func_body_loop_block_replace(CLoopBlock in_loop_block){
+		quaternions.get(in_loop_block.begin_qua).type = QuaDef.EMPTY;
+		quaternions.get(in_loop_block.begin_qua + 1).type = QuaDef.EMPTY;
+		int ifnot_l_index = in_loop_block.begin_qua;
+		for(; ifnot_l_index < in_loop_block.end_qua; ifnot_l_index++){
+			if(quaternions.get(ifnot_l_index).type == QuaDef.IFNOT_L){
+				break;
+			}
+		}
+		quaternions.get(ifnot_l_index).type = QuaDef.IFNOT;
 		CQuaternion loop_qua = new CQuaternion();
 		loop_qua.type = QuaDef.LOOP_BLOCK;
 		loop_qua.loop_block = in_loop_block;
-		quaternions.set(in_loop_block.begin_qua, loop_qua);
+		quaternions.set(ifnot_l_index + 1, loop_qua);
 		CQuaternion jump_qua = new CQuaternion();
 		jump_qua.type = QuaDef.JUMP;
 		jump_qua.data_0 = new CData(DataDef.INT, 
 				(new Integer(in_loop_block.end_qua + 1).toString()));
-		quaternions.set(in_loop_block.begin_qua + 1, jump_qua);
+		quaternions.set(ifnot_l_index + 2, jump_qua);
 	}
 	
 	private void func_body_jump(){

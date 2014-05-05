@@ -5,6 +5,7 @@ import Parsers.GrammarBParser;
 public enum QuaDef {
 	//No use
 	INIT_TYPE,
+	EMPTY,
 	//Special ID
 	GLO_DEC,
 	GLO_DEC_END,

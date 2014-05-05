@@ -29,10 +29,10 @@ public class LanguageBTest01 {
 		//Font initialization
 		CGlobalStaticSource.init_font();
 		
-		/*CExprInputor temp_inputor = new CExprInputor();
+		CExprInputor temp_inputor = new CExprInputor();
 		
-		CDataEntity data_entity = temp_inputor.get_expr("{1,2,3} \\-/ {4}");
-		System.out.println(data_entity.toString());*/
+		CDataEntity data_entity = temp_inputor.get_expr("{1,2,3} \\-/ {x | x > 1 /\\ x < 10}");
+		System.out.println(data_entity.toString());
 		
 		
 		File file = new File("./src/Example.txt");

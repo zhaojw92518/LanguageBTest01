@@ -83,8 +83,14 @@ public enum DeduceDef {
 		else if(equals(LES)){
 			return_result = " < ";
 		}
+		else if(equals(ELES)){
+			return_result = " <= ";
+		}
 		else if(equals(GRE)){
 			return_result = " > ";
+		}
+		else if(equals(EGRE)){
+			return_result = " >= ";
 		}
 		else if(equals(EQU)){
 			return_result = " == ";
@@ -93,25 +99,25 @@ public enum DeduceDef {
 			return_result = " != ";
 		}
 		else if(equals(UNI)){
-			return_result = "\\-/";
+			return_result = " \\-/ ";
 		}
 		else if(equals(INT)){
-			return_result = "/-\\";
+			return_result = " /-\\ ";
 		}
 		else if(equals(SUB_S)){
-			return_result = "--";
+			return_result = " -- ";
 		}
 		else if(equals(NOT)){
-			return_result = "~";
+			return_result = " ~ ";
 		}
-		else if(equals(ADD)){
-			return_result = "/\\";
+		else if(equals(AND)){
+			return_result = " /\\ ";
 		}
 		else if(equals(OR)){
-			return_result = "\\/";
+			return_result = " \\/ ";
 		}
 		else if(equals(ENT)){
-			return_result = "->";
+			return_result = " -> ";
 		}
 		return return_result;
 	}

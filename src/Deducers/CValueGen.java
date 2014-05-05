@@ -65,9 +65,17 @@ public class CValueGen {
 	public static String map_to_str(TreeMap<String, Double> in_map){
 		String return_result = "";
 		for(Map.Entry<String, Double> cur_entry: in_map.entrySet()){
-			if(cur_entry.getValue() > 0){
+			if(cur_entry.getKey().equals("1")){
+				if(cur_entry.getValue() > 0){
+					return_result += " + " + cur_entry.getValue().toString();
+				}
+				else if(cur_entry.getValue() < 0){
+					return_result += cur_entry.getValue().toString();
+				}
+			}
+			else if(cur_entry.getValue() > 0){
 				if(cur_entry.getValue() == 1){
-					return_result = cur_entry.getKey();
+					return_result += " + " + cur_entry.getKey();
 				}
 				else{
 					return_result += " + " + cur_entry.getValue().toString() + "*" + cur_entry.getKey();

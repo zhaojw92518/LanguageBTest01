@@ -106,24 +106,6 @@ public class CDeduceExpr {
 		return return_result;
 	}
 	
-	public String map_to_str(TreeMap<String, Double> in_map){
-		String return_result = "";
-		for(Map.Entry<String, Double> cur_entry: in_map.entrySet()){
-			if(cur_entry.getValue() > 0){
-				return_result += "+" + cur_entry.getValue().toString() + "*" + cur_entry.getKey();
-			}
-			else if(cur_entry.getValue() < 0){
-				return_result += cur_entry.getValue().toString() + "*" + cur_entry.getKey();
-			}
-			else{
-				if(in_map.size() == 1){
-					return_result = "0";
-				}
-			}
-		}
-		return return_result;
-	}
-	
 	/**
 	 * 加法合并
 	 * 将in_map_b合并入in_map_a中
@@ -213,7 +195,7 @@ public class CDeduceExpr {
 		}
 		else{
 			cur_map = new TreeMap<String, Double>();
-			String right_str = map_to_str(in_map_b);
+			String right_str = CValueGen.map_to_str(in_map_b);
 			for(Map.Entry<String, Double> cur_entry: in_map_a.entrySet()){
 				cur_map.put(cur_entry.getKey() + "/(" + right_str + ")", cur_entry.getValue());
 			}
@@ -250,10 +232,10 @@ public class CDeduceExpr {
 		String return_result = null;
 		if(in_expr.type == DeduceDef.SET_LEFT_ARG){
 			if(in_expr.right_data == null){
-				return_result = left_data.data;
+				return_result = in_expr.left_data.data;
 			}
 			else if(in_expr.right_data.type == DeduceDef.SET_LEFT_ARG){
-				return_result = left_data.data + "," + get_set_left_arg_str(right_data);
+				return_result = in_expr.left_data.data + "," + get_set_left_arg_str(in_expr.right_data);
 			}
 		}
 		return return_result;
@@ -282,16 +264,16 @@ public class CDeduceExpr {
 			cur_str += CValueGen.map_to_str(this.right_data.adv_toString());
 			return_result.put(cur_str, 1.0);
 		}
-		else if(this.type.get_level() == 0 && this.type.get_level() == -1){
+		else if(this.type.get_level() == 0 || this.type.get_level() == -1){
 			//如果是条件语句
 			return_result = new TreeMap<String, Double>();
 			return_result.put(
 					"(" +
-					map_to_str(left_data.adv_toString()) + 
+					CValueGen.map_to_str(left_data.adv_toString()) + 
 					")" +
 					this.type.toString() + 
 					"(" +
-					map_to_str(right_data.adv_toString()) +
+					CValueGen.map_to_str(right_data.adv_toString()) +
 					")", 
 					1.0);
 		}
