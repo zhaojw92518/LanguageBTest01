@@ -163,7 +163,9 @@ public class CQuaAnalyzer {
 					loop_block_mgr.add_output_arg(in_id_data.data_str);
 				}
 				String cur_deduce_str = cur_table_magr.get_cur_deduce_str(in_id_data);
-				this.add_loop_deduce_str(cur_deduce_str);
+				if(cur_state != QuaDef.LOOP_INPUT){
+					this.add_loop_deduce_str(cur_deduce_str);
+				}
 			}
 			else if(cur_state == QuaDef.FUNC_BODY){
 				this.add_result_deduce_str(cur_table_magr.get_cur_deduce_str(in_id_data));
@@ -766,6 +768,7 @@ public class CQuaAnalyzer {
 			}
 			cur_state = QuaDef.LOOP_GEN;
 			cur_qua_index = loop_block_mgr.get_cur_loop_block_begin();
+			loop_block_mgr.clear_deduce_strs();
 			if_confirm = true;
 		}
 		else if(deduce_result == DeduceResultDef.ENTER){
