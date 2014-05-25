@@ -2,17 +2,23 @@ MACHINE List (int s)
 INVARIANT
 ATTRIBUTE
 OPERATIONS
-	int factor(int m){
+	int abs_sum(int input_1, int input_2){
 		ATTRIBUTE
-			int x,y,z,a;
-		a = 0;
-		z = 0;	
-		x = 1;	
-		while(x != m){
-			y = x;
-			z = z + y;
-			x = x + 1;
+			int result;
+		result = 0;
+		if(input_1 > 0){
+			result = result + input_1;
 		}
-		return z + 6;
+		else{
+			result = result - input_1;
+		}
+		
+		if(input_2 > 0){
+			result = result + input_2;
+		}
+		else{
+			result = result - input_2;
+		}
+		return result;
 	}
 END

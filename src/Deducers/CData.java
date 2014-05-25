@@ -11,6 +11,7 @@ public class CData {
 	public String data_str = null;
 	
 	public HashSet<CData> set_list = new HashSet<CData>();
+	public LinkedList<CData> element_group = new LinkedList<>();
 	
 	public CData() {}
 	
@@ -61,5 +62,7 @@ public class CData {
 		set_list.add(in_data);
 	}
 	
-
+	public void add_element_group(CData in_data){
+		element_group.add(in_data);
+	}
 }

@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import ContextUI.CGlobalStaticSource;
 import Defines.DataDef;
 import Defines.DeduceDef;
 import PackageMsg.COptionMsg;
@@ -82,7 +83,13 @@ public class CValueGen {
 				}
 			}
 			else if(cur_entry.getValue() < 0){
-				return_result += cur_entry.getValue().toString() + "*" + cur_entry.getKey();
+				if(cur_entry.getValue() == -1){
+					return_result += " - " + cur_entry.getKey();
+				}
+				else{
+					return_result += " - " + new Double(-cur_entry.getValue().doubleValue()).toString() + "*" + cur_entry.getKey();
+				}
+				//return_result += cur_entry.getValue().toString() + "*" + cur_entry.getKey();
 			}
 			else{
 				if(in_map.size() == 1){

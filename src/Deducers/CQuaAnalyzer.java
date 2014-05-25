@@ -337,7 +337,7 @@ public class CQuaAnalyzer {
 		if(check_cur_qua_type(QuaDef.FUNC_CON_DEC_END)){
 			cur_state = QuaDef.FUNC;
 		}
-		else if(check_cur_qua_type(QuaDef.ARG)){
+		else if(check_cur_qua_type(QuaDef.DEC)){
 			if(cur_qua.data_0.type_data == DataDef.SET){
 				cur_table_magr.create_local_term(cur_qua.data_1, DataDef.SET);
 				set_term(cur_qua.data_1, qua_set_to_term_set(cur_qua.data_2.set_list));
@@ -394,12 +394,18 @@ public class CQuaAnalyzer {
 			if(check_cur_qua_type(QuaDef.LES)){
 				func_body_les();
 			}
+			else if(check_cur_qua_type(QuaDef.ELES)){
+				func_body_eles();
+			}
 			else if(check_cur_qua_type(QuaDef.EQU)){
 				func_body_equ();
 			}
 			
 			else if(check_cur_qua_type(QuaDef.GRE)){
 				func_body_gre();
+			}
+			else if(check_cur_qua_type(QuaDef.EGRE)){
+				func_body_egre();
 			}
 			else if(check_cur_qua_type(QuaDef.UEQU)){
 				func_body_uequ();
@@ -496,6 +502,10 @@ public class CQuaAnalyzer {
 		deal_ternary_qua(DeduceDef.LES);
 	}
 	
+	private void func_body_eles(){
+		deal_ternary_qua(DeduceDef.ELES);
+	}
+	
 	private void func_body_rev(){
 		deal_duality_qua(DeduceDef.REV);
 	}
@@ -506,6 +516,10 @@ public class CQuaAnalyzer {
 	
 	private void func_body_gre(){
 		deal_ternary_qua(DeduceDef.GRE);
+	}
+	
+	private void func_body_egre(){
+		deal_ternary_qua(DeduceDef.EGRE);
 	}
 
 	private void func_body_add(){
@@ -755,7 +769,14 @@ public class CQuaAnalyzer {
 			context_frame.set_output_id_value(context_frame.get_text_str());
 		}
 		else if(deduce_result == DeduceResultDef.CONFIRM){
+			//Debug
+			//HashMap<String, String> debug_map_0 = new HashMap<>(), debug_map_1 = new HashMap<>();
+			//debug_map_0.put("result", "result + _ * x + (_ - 1) * _ / 2");
+			//debug_map_0.put("x", "_ + x");
+			//debug_map_1.put("_", "m - x + 1");
+			//Debug End
 			HashMap<String, String> n_plus_one_map = loop_block_mgr.input_output_args(context_frame.get_id_value_map(), context_frame.get_iterations_input_str());
+			//HashMap<String, String> n_plus_one_map = loop_block_mgr.input_output_args(debug_map_0, "m - x + 1");
 			context_frame.update_output_values(n_plus_one_map);
 			for(Map.Entry<String, CDataEntity> cur_entry: loop_block_mgr.get_cur_block().output_args.entrySet()){
 				if(cur_entry.getValue().type == DataDef.VALUE){

@@ -187,6 +187,7 @@ public class CLoopBlock {
 			output_args.put(cur_entry.getKey(), cur_entity);
 		}
 		iterations_input.assign(new CDeduceExpr(DeduceDef.SUB, iterations_input.dup(), new CDeduceExpr("1")));//赋值为第N - 1代
+		expr_replace(iterations_input);
 		iterations_count = iterations_input;
 		return return_result;
 	}

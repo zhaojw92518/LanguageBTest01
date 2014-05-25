@@ -113,3 +113,45 @@ OPERATIONS
 	}
 END
 
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int summary(int m){
+		ATTRIBUTE
+			int x,result;
+		x = 1;
+		result = 0;
+		while(x <= m){
+			result = result + x;
+			x = x + 1;
+		}
+		return result;
+	}
+END
+
+MACHINE List (int s)
+INVARIANT
+ATTRIBUTE
+OPERATIONS
+	int abs_sum(int input_1, int input_2){
+		ATTRIBUTE
+			int result;
+		result = 0;
+		if(input_1 > 0){
+			result = result + input_1;
+		}
+		else{
+			result = result - input_1;
+		}
+		
+		if(input_2 > 0){
+			result = result + input_2;
+		}
+		else{
+			result = result - input_2;
+		}
+		return result;
+	}
+END
+

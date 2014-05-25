@@ -10,6 +10,7 @@ public enum DataDef {
 	CHAR,
 	SPEC,
 	SET,
+	ELEMENT_GROUP,
 	VALUE,//值变量
 	TYPE;
 	
