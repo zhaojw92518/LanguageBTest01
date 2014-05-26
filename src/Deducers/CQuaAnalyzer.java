@@ -562,6 +562,20 @@ public class CQuaAnalyzer {
 		func_body_set_duality(DeduceDef.INT);
 	}
 	
+	private CDeduceExpr get_element_group_expr(CData in_data){
+		CDeduceExpr return_result = new CDeduceExpr();
+		return_result.type = DeduceDef.ELEMENT_GROUP_DATA;
+		return_result.data = in_data.element_group.getLast().data_str;
+		for(int i = in_data.element_group.size() - 2; i >= 0; i--){
+			CDeduceExpr temp_expr = new CDeduceExpr(DeduceDef.ELEMENT_GROUP_DATA, in_data.element_group.get(i).data_str, null, null);
+			return_result = new CDeduceExpr(DeduceDef.ELEMENT_GROUP_DATA, null, 
+					temp_expr, 
+					return_result);
+		}
+		return_result = new CDeduceExpr(DeduceDef.ELEMENT_GROUP, return_result, null);
+		return return_result;
+	}
+	
 	private CSetStruct qua_set_to_term_set(HashSet<CData> in_set){
 		CSetStruct return_result = new CSetStruct(DeduceDef.DATA);
 		for(CData cur_data: in_set){
@@ -570,6 +584,9 @@ public class CQuaAnalyzer {
 			}
 			else if(cur_data.type == DataDef.ID){
 				return_result.add(new CDeduceTerm(get_cur_expr(cur_data)));
+			}
+			else if(cur_data.type == DataDef.ELEMENT_GROUP){
+				return_result.add(new CDeduceTerm(get_element_group_expr(cur_data)));
 			}
 		}
 		return return_result;

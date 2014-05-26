@@ -156,7 +156,8 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			return_result = new CData();
 			return_result.type = DataDef.SET;
 			for(int i = 0; i < ctx.element().size(); i++){
-				return_result.add_set_element(visitElementRD(ctx.element(i)));
+				CData temp_data = visitElementRD(ctx.element(i));
+				return_result.add_set_element(temp_data);
 			}
 		}
 		return return_result;
@@ -405,7 +406,7 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 			return_result = visitExpressionRD(ctx.expression());
 		}
 		else if(ctx.element_group() != null){
-			
+			return_result = visitElement_groupRD(ctx.element_group());
 		}
 		else if(ctx.BOOL() != null){
 			
@@ -720,7 +721,15 @@ public class MyVisitor extends GrammarBBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.
 	 */
 	@Override public String visitElement_group(@NotNull GrammarBParser.Element_groupContext ctx) { return visitChildren(ctx); }
-
+	
+	public CData visitElement_groupRD(@NotNull GrammarBParser.Element_groupContext ctx) { 
+		CData return_result = new CData(DataDef.ELEMENT_GROUP, "0");
+		for(int i = 0; i < ctx.element().size(); i++){
+			return_result.add_element_group(visitElementRD(ctx.element(i)));
+		}
+		return return_result;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * <p/>

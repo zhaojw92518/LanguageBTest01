@@ -241,6 +241,22 @@ public class CDeduceExpr {
 		return return_result;
 	}
 	
+	public LinkedList<String> get_element_group_data(CDeduceExpr in_expr){
+		LinkedList<String> return_result = new LinkedList<>();
+		if(in_expr.left_data == null && in_expr.right_data == null){
+			return_result.add(in_expr.data);
+		}
+		else{
+			if(in_expr.left_data != null){
+				return_result.addAll(get_element_group_data(in_expr.left_data));
+			}
+			if(in_expr.right_data != null){
+				return_result.addAll(get_element_group_data(in_expr.right_data));
+			}
+		}
+		return return_result;
+	}
+	
 	public TreeMap<String, Double> adv_toString(){
 		TreeMap<String, Double> return_result = null;
 		if(this.type == DeduceDef.DATA){
@@ -263,6 +279,15 @@ public class CDeduceExpr {
 			String cur_str = get_set_left_arg_str(this.left_data) + " | ";
 			cur_str += CValueGen.map_to_str(this.right_data.adv_toString());
 			return_result.put(cur_str, 1.0);
+		}
+		else if(this.type == DeduceDef.ELEMENT_GROUP){
+			LinkedList<String> cur_str_list = get_element_group_data(left_data);
+			String temp_str = cur_str_list.getFirst();
+			for(int i = 1; i < cur_str_list.size(); i++){
+				temp_str += "," + cur_str_list.get(i);
+			}
+			return_result = new TreeMap<String, Double>();
+			return_result.put(temp_str, 1.0);
 		}
 		else if(this.type.get_level() == 0 || this.type.get_level() == -1){
 			//如果是条件语句

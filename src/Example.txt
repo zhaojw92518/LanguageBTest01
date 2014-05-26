@@ -2,23 +2,12 @@ MACHINE List (int s)
 INVARIANT
 ATTRIBUTE
 OPERATIONS
-	int abs_sum(int input_1, int input_2){
+	int delete_zero(set in_array){
 		ATTRIBUTE
-			int result;
-		result = 0;
-		if(input_1 > 0){
-			result = result + input_1;
-		}
-		else{
-			result = result - input_1;
-		}
-		
-		if(input_2 > 0){
-			result = result + input_2;
-		}
-		else{
-			result = result - input_2;
-		}
-		return result;
+			int result, __x, __y;
+		in_array = in_array -- {<<__x, 0>>};
+		in_array = in_array -- {<<0, __y>>};
+		in_array = in_array \-/ {<<__x, __y>>};
+		return 0;
 	}
 END

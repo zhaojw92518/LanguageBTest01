@@ -10,6 +10,10 @@ public enum DeduceDef {
 	REV,
 	RET,
 	
+	//元组
+	ELEMENT_GROUP,
+	ELEMENT_GROUP_DATA,
+	
 	//集合不定数量元素表示
 	SET_ELE,
 	SET_LEFT_ARG,
